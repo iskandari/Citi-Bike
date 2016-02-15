@@ -17,7 +17,7 @@
 
 Sys.setenv(TZ='EST')
 
-raw_data = Mar2015
+raw_data = Jan2015
 
 unique_id = unique(raw_data$bikeid)
 output1 <- data.frame("bikeid"= integer(0), "end.station.id"= integer(0), "start.station.id" = integer(0), "diff.time" = numeric(0),  "stoptime" = character(),"starttime" = character(), stringsAsFactors=FALSE)
@@ -44,7 +44,7 @@ for (bikeid in unique_id)
   }
 }
 
-output1_stoptime <- as.POSIXct(output1$stoptime, "%m/%d/%Y %H:%M:%S", tz = "EST")
+output1_stoptime <- as.POSIXct(output1$stoptime, "%m/%d/%Y %H:%M", tz = "EST")
 output1[5] <- output1_stoptime
 output1_starttime <- as.POSIXct(output1$starttime, "%Y-%m-%d %H:%M:%S", tz = "EST")
 output1[6] <- output1_starttime
@@ -223,8 +223,7 @@ rbOct2013$hour <- hour(rbOct2013$midtime)
 
 rbOct2014$hour <- hour(rbOct2014$midtime) 
 rbOct2015$hour <- hour(rbOct2015$midtime) 
-
-Oct_2014$starttime <- strptime(Oct_2014$starttime, "%m/%d/%Y %H:%M:%S", tz = "EST")
+<- strptime(Oct_2014$starttime, "%m/%d/%Y %H:%M:%S", tz = "EST")
 
 
 df4$stoptime <- strptime(Oct_2014$stoptime, "%m/%d/%Y %H:%M:%S", tz = "EST")a
@@ -245,13 +244,14 @@ one_day$seventh <- one_day$stoptime + 0.7*difftime(one_day$starttime, one_day$st
 one_day$eighth <- one_day$stoptime + 0.8*difftime(one_day$starttime, one_day$stoptime, units = "secs")
 one_day$ninth <- one_day$stoptime + 0.9*difftime(one_day$starttime, one_day$stoptime, units = "secs")
 
-ALLRB$stoptime <- strptime(ALLRB$stoptime, "%Y-%m-%d %H:%M:%S", tz = "EST")
-ALLRB$starttime <- strptime(ALLRB$starttime, "%Y-%m-%d %H:%M:%S", tz = "EST")
-ALLRB$midtime <- as.POSIXct((as.numeric(ALLRB$stoptime) + as.numeric(ALLRB$starttime)) / 2, origin = '1970-01-01')
+All$stoptime <- strptime(All$stoptime, "%Y-%m-%d %H:%M:%S", tz = "EST")
+All$starttime <- strptime(All$starttime, "%Y-%m-%d %H:%M:%S", tz = "EST")
+All$midtime <- as.POSIXct((as.numeric(All$stoptime) + as.numeric(All$starttime)) / 2, origin = '1970-01-01')
+
+
+
 
 ALLRB$year <- year(ALLRB$midtime)
-
-
 ALLRB_2013 <- ALLRB[ALL]
 
 
