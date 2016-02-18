@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset=utf-8 />
+<title>HTML markers from geoJSON url</title>
+<meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+<script src='https://api.mapbox.com/mapbox.js/v2.2.2/mapbox.js'></script>
+<link href='https://api.mapbox.com/mapbox.js/v2.2.2/mapbox.css' rel='stylesheet' />
+<style>
+
+  * { font-family: Arial; }
+  body { margin:0; padding:0; }
+  #map { position:absolute; top:0; bottom:0; width:100%; }
+  h1 { font-size: 28px; width: 400px; margin-left: -200px; text-align: center; color: #fff; position: absolute; left: 50%; top: 0px; z-index: 1345; opacity: 0.7 }
+  .label { color: #222; display: inline-block; height: 20px; width: 30px; text-align: center; line-height: 20px; padding-left: 5px; padding-right: 5px; left: -15px;  top: -10px; }
+  #legend { padding: 10px; width: 300px; margin-left: -150px; text-align: center; color: #d0d0d0; position: absolute; left: 50%; bottom: 30px; z-index: 1345; background:  rgba(0,0,0,0.5); }
+  .caption, .circle { display: inline-block; line-height: 16px; padding: 2px; vertical-align: bottom; }
+  #c1 { border-radius: 4px; width: 8px; height: 8px; display: inline-block; background: #FF0000; opacity: 0.6; }
+  #c2 { border-radius: 8px; width: 15px; height: 15px; display: inline-block; background: #FF0000; opacity: 0.6; }
+  #c3 { border-radius: 12px; width: 24px; height: 24px; display: inline-block; background: #FF0000; opacity: 0.6; }
+  #c4 { 10px; border-radius: 16px; width: 32px; height: 32px; display: inline-block; background: #FF0000; opacity: 0.6; }
+
+</style>
+</head>
+<body>
+<h1>Citibike: rebalancing <br /> bikes taken per <br /> station: 2013-15 </h1>
+<div id='map'></div>
+<div id='legend'>
+  <div class='caption'>250</div>
+  <div class='circle'><div id='c1'></div></div>
+  <div class='circle'><div id='c2'></div></div>
+  <div class='circle'><div id='c3'></div></div>
+  <div class='circle'><div id='c4'></div></div>
+  <div class='caption'>40436</div>
+</div>
+
+
+<script>
+L.mapbox.accessToken = 'pk.eyJ1IjoiaXNrYW5kYXJibHVlIiwiYSI6ImNpazE3MTJldjAzYzZ1Nm0wdXZnMGU2MGMifQ.i3E1_b9QXJS8xXuPy3OTcg';
+var map = L.mapbox.map('map', 'mapbox.dark')
+    .setView([40.722,-74.006], 13);
+
+
+var stationsLayer = L.mapbox.featureLayer().addTo(map);
+var labelsLayer = L.mapbox.featureLayer().addTo(map);
+
+
+L.mapbox.featureLayer()
+  .loadURL('taken.geojson')
+  .on('ready', function(e) {
+
+    e.target.eachLayer(function(layer) {
+      var source = e.target.getGeoJSON();
+
+L.mapbox.featureLayer()
+        .loadURL('countour_map.geojson')
+        .addTo(map);
+
+//        console.log(layer.latLng());
+///
+
+        L.circleMarker([layer.feature.geometry.coordinates[1],layer.feature.geometry.coordinates[0]], {
+          radius: Math.sqrt(layer.feature.properties.taken/200),
+          //radius: Math.sqrt(layer.feature.properties.capacity)*4,
+          fillColor: "#FF0000",
+          stroke: false,
+          fillOpacity: 0.5
+        })
+        .bindPopup('' + layer.feature.properties['taken'])
+        //.on('click', function(e) { console.log('click'); })
+        .addTo(stationsLayer);
+
+/*        layer.feature.properties['icon'] = {
+        "className": "label", // class name to style
+        "html": layer.feature.properties.agg_RB_Freq, // add html content inside the marker
+        "iconSize": null // size of icon, use null to set the size in CSS
+        };
+        layer.bindPopup(layer.feature.properties['agg_RB_Freq']);
+        layer.setIcon(L.divIcon(layer.feature.properties.icon));
+        layer.addTo(labelsLayer);
+*/
+
+
+        })
+
+
+  });
+//  .addTo(map);
+
+stationsLayer.on('mouseover', function(e) {
+    e.layer.openPopup();
+});
+stationsLayer.on('mouseout', function(e) {
+    e.layer.closePopup();
+});
+
+map.on('zoomend', function() {
+  console.log(map.getZoom());
+    var z = map.getZoom();
+    if (z > 13){
+      labelsLayer.setFilter(function() {return true;});
+    } else {
+      labelsLayer.setFilter(function() {return false});
+    }
+ //your code here to hide the labels
+});
+
+</script>
+</body>
+</html>
