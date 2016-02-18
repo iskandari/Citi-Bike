@@ -68,7 +68,7 @@ var routes = L.mapbox.featureLayer();
 var circles = L.mapbox.featureLayer();
 
   L.mapbox.featureLayer()
-    .loadURL('data/routes.geojson')
+    .loadURL('routes.geojson')
     .on('ready', function(e) {
       var source = e.target.getGeoJSON();
 
