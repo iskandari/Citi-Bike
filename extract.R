@@ -6,7 +6,7 @@
 #IMPORTANT: Please keep in mind that there are two separate codes for extracting truck deliveries.
 
 # The first is for months in which the time format = "%m/%d/%Y %H:%M" , for example June and March 2015
-# The second is for months in which the time format = "%m/%d/%Y %H:%M:%S", for example August-November 2015
+# The second is for months in which the time format = "%m/%d/%Y %H:%M:%S", for example August-Junember 2015
 # Please check the time formats first before running the code because citibike data does not seem to follow 
 # a consistent pattern with time formats
 
@@ -17,7 +17,7 @@
 
 Sys.setenv(TZ='EST')
 
-raw_data = Jan2015
+raw_data = Nov2014
 
 unique_id = unique(raw_data$bikeid)
 output1 <- data.frame("bikeid"= integer(0), "end.station.id"= integer(0), "start.station.id" = integer(0), "diff.time" = numeric(0),  "stoptime" = character(),"starttime" = character(), stringsAsFactors=FALSE)
@@ -25,7 +25,7 @@ output1 <- data.frame("bikeid"= integer(0), "end.station.id"= integer(0), "start
 for (bikeid in unique_id)
 {
   onebike <- raw_data[ which(raw_data$bikeid== bikeid), ]
-  onebike$starttime <- strptime(onebike$starttime, "%m/%d/%Y %H:%M", tz = "EST")
+  onebike$starttime <- strptime(onebike$starttime, "%m/%d/%Y %H:%M:%S", tz = "EST")
   onebike <- onebike[order(onebike$starttime, decreasing = FALSE),]
   onebike$starttime <- as.factor(as.character(onebike$starttime))
   onebike$stoptime <- as.factor(as.character(onebike$stoptime))
@@ -35,7 +35,7 @@ for (bikeid in unique_id)
       if(is.integer(onebike[i-1,"end.station.id"]) & is.integer(onebike[i,"start.station.id"]) &
          onebike[i-1,"end.station.id"] != onebike[i,"start.station.id"]){
         diff_time <- as.double(difftime(strptime(onebike[i,"starttime"], "%Y-%m-%d %H:%M:%S", tz = "EST"),
-                                        strptime(onebike[i-1,"stoptime"], "%m/%d/%Y %H:%M", tz = "EST")
+                                        strptime(onebike[i-1,"stoptime"], "%m/%d/%Y %H:%M:%S", tz = "EST")
                                         ,units = "secs"))
         new_row <- c(bikeid, onebike[i-1,"end.station.id"], onebike[i,"start.station.id"], diff_time, as.character(onebike[i-1,"stoptime"]), as.character(onebike[i,"starttime"]))
         output1[nrow(output1) + 1,] = new_row
@@ -44,7 +44,7 @@ for (bikeid in unique_id)
   }
 }
 
-output1_stoptime <- as.POSIXct(output1$stoptime, "%m/%d/%Y %H:%M", tz = "EST")
+output1_stoptime <- as.POSIXct(output1$stoptime, "%m/%d/%Y %H:%M:%S", tz = "EST")
 output1[5] <- output1_stoptime
 output1_starttime <- as.POSIXct(output1$starttime, "%Y-%m-%d %H:%M:%S", tz = "EST")
 output1[6] <- output1_starttime
@@ -109,7 +109,7 @@ Sys.setenv(TZ='EST')
 output1$diff.time <- as.numeric(output1$diff.time)
 output2$diff.time <- as.numeric(output2$diff.time)
 
-one_hour_all_Nov <- output1[output1$diff.time < 3600 & output1$diff.time > 0,]
+one_hour_all_Jun <- output1[output1$diff.time < 3600 & output1$diff.time > 0,]
 one_hour_all_Dec<- output2[output2$diff.time < 3600 & output2$diff.time > 0,]
 
 one_hour_all_Dec$midtime <- as.POSIXct((as.numeric(one_hour_all_Dec$stoptime) + as.numeric(one_hour_all_Dec$starttime)) / 2, origin = '1970-01-01')
@@ -124,16 +124,23 @@ days_Dec2013
 ##Extract truck movements on a specific day that occurred within a specified time window. 
 
 #After importing from folder 
-All_One_Hour_2014$stoptime <- strptime(All_One_Hour_2014$stoptime, "%Y-%m-%d %H:%M:%S", tz = "EST")
-All_One_Hour_2014$starttime <- strptime(All_One_Hour_2014$starttime, "%Y-%m-%d %H:%M:%S", tz = "EST")
-All_One_Hour_2014$midtime <- strptime(All_One_Hour_2014$midtime, "%Y-%m-%d %H:%M:%S", tz = "EST")
+ALLRB$stoptime <- strptime(ALLRB$stoptime, "%Y-%m-%d %H:%M:%S", tz = "EST")
+ALLRB$starttime <- strptime(ALLRB$starttime, "%Y-%m-%d %H:%M:%S", tz = "EST")
+ALLRB$midtime <- as.POSIXct((as.numeric(ALLRB$stoptime) + as.numeric(ALLRB$starttime)) / 2, origin = '1970-01-01')ye
+
+ALLRB$year <- year(ALLRB$midtime)
+
+
+ALLRB_2014 <- ALLRB[ALLRB$year == 2014, ]
+
 
 lapply(All_One_Hour_2014, class)
 
-All_2014$stoptime <- strptime(All$stoptime, "%Y-%m-%d %H:%M:%S", tz = "EST")
-All_2014$starttime <- strptime(All$starttime, "%Y-%m-%d %H:%M:%S", tz = "EST")
+ALLRB$stoptime <- strptime(ALLRB$stoptime, "%Y-%m-%d %H:%M:%S", tz = "EST")
+ALLRB$starttime <- strptime(ALLRB$starttime, "%Y-%m-%d %H:%M:%S", tz = "EST")
+ALLRB$midtime <- as.POSIXct((as.numeric(ALLRB$stoptime) + as.numeric(ALLRB$starttime)) / 2, origin = '1970-01-01')
 
-All_2014$midtime <- as.POSIXct((as.numeric(All_2014$stoptime) + as.numeric(All_2014$starttime)) / 2, origin = '1970-01-01')
+
 All_2014$midtime <- strptime(All_2014$midtime, "%Y-%m-%d %H:%M:%S", tz = "EST")
 
 one.day_1 <- output1[output1$stoptime >="2015-11-02 00:00:00" & output1$starttime <= "2015-11-03 00:00:00" & output1$diff.time < 3600 & output1$diff.time > 0, ]
@@ -166,7 +173,7 @@ myData <- myData[-c(2, 4, 6), ]
 
 # Bind movements together
 
-one_hour_ALL <- rbind(one_hour_all_Jan, one_hour_all_Feb, one_hour_all_Mar, one_hour_all_Apr, one_hour_all_May, one_hour_all_Jun, one_hour_all_Jul, one_hour_all_Aug, one_hour_all_Sep, one_hour_all_Oct, one_hour_all_Nov)
+one_hour_ALL <- rbind(one_hour_all_Jan, one_hour_all_Feb, one_hour_all_Mar, one_hour_all_Apr, one_hour_all_May, one_hour_all_Jun, one_hour_all_Jul, one_hour_all_Aug, one_hour_all_Sep, one_hour_all_Oct, one_hour_all_Jun)
 
 bikeid.ll<- bikeid.ll[c(2,1,3,4,5,6,7,8,9,10,11,12,13)]
 
@@ -196,9 +203,17 @@ all_Oct2014
 all_Oct2014 <- all_Oct2014[all_Oct2014$diff.time > 0 & all_Oct2014$diff.time < 86400,]
 all_Oct2014 <- all_Oct2014[all_Oct2014$start.station.id == 465,]
 
-json$created_at <- strptime(json$created_at, "%Y-%m-%d %H:%M:%S", tz = "EST")
+Json_Octobers$created_at <- strptime(Json_Octobers$created_at, "%Y-%m-%d %H:%M:%S", tz = "EST")
 
-all_Oct2014$starttime <- strptime(all_Oct2014$starttime, "%Y-%m-%d %H:%M:%S", tz = "EST")
+
+Oct2013$starttime <- strptime(Oct2013$starttime, "%Y-%m-%d %H:%M:%S", tz = "EST")
+
+Oct2015$starttime <- strptime(Oct2015$starttime, "%m/%d/%Y %H:%M:%S", tz = "EST")
+
+
+
+
+
 all_Oct2014$midtime <- as.POSIXct((as.numeric(all_Oct2014$stoptime) + as.numeric(all_Oct2014$starttime)) / 2, origin = '1970-01-01')
 
 json_AUG19 < strptime(json$created_at, "%Y-%m-%d %H:%M:%S", tz = "EST")
@@ -207,13 +222,15 @@ rbOct2013$stoptime <- strptime(rbOct2013$stoptime, "%Y-%m-%d %H:%M:%S", tz = "ES
 rbOct2013$starttime <- strptime(rbOct2013$starttime, "%Y-%m-%d %H:%M:%S", tz = "EST")
 rbOct2013$midtime <- as.POSIXct((as.numeric(rbOct2013$stoptime) + as.numeric(rbOct2013$starttime)) / 2, origin = '1970-01-01')
 
-rbOct2014$stoptime <- strptime(rbOct2014$stoptime, "%Y-%m-%d %H:%M:%S", tz = "EST")
-rbOct2014$starttime <- strptime(rbOct2014$starttime, "%Y-%m-%d %H:%M:%S", tz = "EST")
-rbOct2014$midtime <- as.POSIXct((as.numeric(rbOct2014$stoptime) + as.numeric(rbOct2014$starttime)) / 2, origin = '1970-01-01')
+rb$stoptime <- strptime(rb$stoptime, "%Y-%m-%d %H:%M:%S", tz = "EST")
+rb$starttime <- strptime(rb$starttime, "%Y-%m-%d %H:%M:%S", tz = "EST")
+rb$midtime <- as.POSIXct((as.numeric(rb$stoptime) + as.numeric(rb$starttime)) / 2, origin = '1970-01-01')
 
-rbOct2015$stoptime <- strptime(rbOct2015$stoptime, "%Y-%m-%d %H:%M:%S", tz = "EST")
-rbOct2015$starttime <- strptime(rbOct2015$starttime, "%Y-%m-%d %H:%M:%S", tz = "EST")
-rbOct2015$midtime <- as.POSIXct((as.numeric(rbOct2015$stoptime) + as.numeric(rbOct2015$starttime)) / 2, origin = '1970-01-01')
+Oct2015$stoptime <- strptime(Oct2015$stoptime, "%Y-%m-%d %H:%M:%S", tz = "EST")
+
+Oct2015$starttime <- strptime(Oct2015$starttime, "%m/%d/%Y %H:%M:%S", tz = "EST")
+
+Oct2015$midtime <- as.POSIXct((as.numeric(Oct2015$stoptime) + as.numeric(Oct2015$starttime)) / 2, origin = '1970-01-01')
 
 rbOct2013 <- rbOct2013[rbOct2013$diff.time > 0 & rbOct2013$diff.time < 43200,]
 rbOct2014 <- rbOct2014[rbOct2014$diff.time > 0 & rbOct2014$diff.time < 43200,]
@@ -226,7 +243,8 @@ rbOct2015$hour <- hour(rbOct2015$midtime)
 <- strptime(Oct_2014$starttime, "%m/%d/%Y %H:%M:%S", tz = "EST")
 
 
-df4$stoptime <- strptime(Oct_2014$stoptime, "%m/%d/%Y %H:%M:%S", tz = "EST")a
+a2015$starttime <- strptime(a2015$starttime, "%m/%d/%Y %H:%M:%S", tz = "EST")a
+
 
 
 
@@ -244,16 +262,29 @@ one_day$seventh <- one_day$stoptime + 0.7*difftime(one_day$starttime, one_day$st
 one_day$eighth <- one_day$stoptime + 0.8*difftime(one_day$starttime, one_day$stoptime, units = "secs")
 one_day$ninth <- one_day$stoptime + 0.9*difftime(one_day$starttime, one_day$stoptime, units = "secs")
 
-All$stoptime <- strptime(All$stoptime, "%Y-%m-%d %H:%M:%S", tz = "EST")
+heydt$created_at <- strptime(heydt$created_at, "%Y-%m-%d %H:%M:%S", tz = "EST")
+
 All$starttime <- strptime(All$starttime, "%Y-%m-%d %H:%M:%S", tz = "EST")
 All$midtime <- as.POSIXct((as.numeric(All$stoptime) + as.numeric(All$starttime)) / 2, origin = '1970-01-01')
 
+$starttime<- as.POSIXct(a2013$starttime, "%Y-%m-%d %H:%M:%S", tz = "EST")
+a2013$stoptime<- as.POSIXct(a2013$stoptime, "%Y-%m-%d %H:%M:%S", tz = "EST")
 
+a$starttime <- Aug[Aug$starttime > "2014-08-19 00:00:00" & Aug$starttime < "2014-08-20 00:00:00", ]
+a <- Aug[Aug$stoptime > "2014-08-19 00:00:00" & Aug$stoptime < "2014-08-20 00:00:00", ]
+
+
+
+
+
+twodays <- Aug[Aug$starttime > "2014-08-18 06:00:00" & Aug$stoptime < "2014-08-19 10:00:00",]
 
 
 ALLRB$year <- year(ALLRB$midtime)
 ALLRB_2013 <- ALLRB[ALL]
 
+
+Oct2013$starttime <- as.POSIXct((as.numeric(data$stoptime) + as.numeric(data$starttime)) / 2, origin = '1970-01-01')
 
 
 
