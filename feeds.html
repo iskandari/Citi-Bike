@@ -160,7 +160,7 @@ function drawGraph(data,sid,stroke,opacity) {
 function heydt_matrix() {
     rect.text("");
     circles.text("");
-    d3.csv("feeds/heydt_matrix.csv", function(csv) {
+    d3.csv("heydt_matrix.csv", function(csv) {
         //console.log(csv);
       csv.forEach(function(r) {
         heydt_data[r.sid] = []; //setting array
@@ -180,7 +180,7 @@ function heydt_matrix() {
   function openbus_matrix() {
       rect.text("");
       circles.text("");
-      d3.csv("feeds/openbus_matrix.csv", function(csv) {
+      d3.csv("openbus_matrix.csv", function(csv) {
           //console.log(csv);
         csv.forEach(function(r) {
           openbus_data[r.sid] = []; //setting array
