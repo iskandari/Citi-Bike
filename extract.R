@@ -15,7 +15,7 @@
 #WARNING Please make sure the system time is EST! 
 
 
-Sys.setenv(TZ='EST')
+Sys.setenv(TZ='CST')
 
 raw_data = Jan2015
 
@@ -196,7 +196,9 @@ all_Oct2014
 all_Oct2014 <- all_Oct2014[all_Oct2014$diff.time > 0 & all_Oct2014$diff.time < 86400,]
 all_Oct2014 <- all_Oct2014[all_Oct2014$start.station.id == 465,]
 
-json$created_at <- strptime(json$created_at, "%Y-%m-%d %H:%M:%S", tz = "EST")
+heydt$created_at <- strptime(heydt$created_at, "%Y-%m-%d %H:%M:%S", tz = "EST")
+
+
 
 all_Oct2014$starttime <- strptime(all_Oct2014$starttime, "%Y-%m-%d %H:%M:%S", tz = "EST")
 all_Oct2014$midtime <- as.POSIXct((as.numeric(all_Oct2014$stoptime) + as.numeric(all_Oct2014$starttime)) / 2, origin = '1970-01-01')
@@ -246,7 +248,8 @@ one_day$ninth <- one_day$stoptime + 0.9*difftime(one_day$starttime, one_day$stop
 
 All$stoptime <- strptime(All$stoptime, "%Y-%m-%d %H:%M:%S", tz = "EST")
 All$starttime <- strptime(All$starttime, "%Y-%m-%d %H:%M:%S", tz = "EST")
-All$midtime <- as.POSIXct((as.numeric(All$stoptime) + as.numeric(All$starttime)) / 2, origin = '1970-01-01')
+
+heydt$created_at <- as.POSIXct(heydt$created_at)
 
 
 
